@@ -25,7 +25,7 @@ resources:
 
       tasks:
         - task_key: raw_extract
-          existing_cluster_id: 0907-120836-jlbuja4g
+          existing_cluster_id: CLUSTER_ID
           python_wheel_task:
             package_name: youtube_channel_analytics_medallion
             entry_point: raw
@@ -60,7 +60,7 @@ resources:
         - task_key: bronze_channel
           depends_on:
             - task_key: raw_extract
-          existing_cluster_id: 0907-120836-jlbuja4g
+          existing_cluster_id: CLUSTER_ID
           python_wheel_task:
             package_name: youtube_channel_analytics_medallion
             entry_point: bronze_channel
@@ -95,7 +95,7 @@ resources:
         - task_key: bronze_video
           depends_on:
             - task_key: raw_extract
-          existing_cluster_id: 0907-120836-jlbuja4g
+          existing_cluster_id: CLUSTER_ID
           python_wheel_task:
             package_name: youtube_channel_analytics_medallion
             entry_point: bronze_video
@@ -130,7 +130,7 @@ resources:
         - task_key: bronze_comment
           depends_on:
             - task_key: raw_extract
-          existing_cluster_id: 0907-120836-jlbuja4g
+          existing_cluster_id: CLUSTER_ID
           python_wheel_task:
             package_name: youtube_channel_analytics_medallion
             entry_point: bronze_comment
@@ -165,7 +165,7 @@ resources:
         - task_key: silver_channel
           depends_on:
             - task_key: bronze_channel
-          existing_cluster_id: 0907-120836-jlbuja4g
+          existing_cluster_id: CLUSTER_ID
           python_wheel_task:
             package_name: youtube_channel_analytics_medallion
             entry_point: silver_transform
@@ -196,7 +196,7 @@ resources:
         - task_key: silver_video
           depends_on:
             - task_key: bronze_video
-          existing_cluster_id: 0907-120836-jlbuja4g
+          existing_cluster_id: CLUSTER_ID
           python_wheel_task:
             package_name: youtube_channel_analytics_medallion
             entry_point: silver_transform
@@ -227,7 +227,7 @@ resources:
         - task_key: silver_comment
           depends_on:
             - task_key: bronze_comment
-          existing_cluster_id: 0907-120836-jlbuja4g
+          existing_cluster_id: CLUSTER_ID
           python_wheel_task:
             package_name: youtube_channel_analytics_medallion
             entry_point: silver_transform
@@ -260,7 +260,7 @@ resources:
             - task_key: silver_channel
             - task_key: silver_comment
             - task_key: silver_video
-          existing_cluster_id: 0907-120836-jlbuja4g
+          existing_cluster_id: CLUSTER_ID
           python_wheel_task:
             package_name: youtube_channel_analytics_medallion
             entry_point: gold_yt_statistics

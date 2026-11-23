@@ -36,9 +36,9 @@ targets:
     mode: development
     default: true
     workspace:
-      host: https://adb-7405616644634907.7.azuredatabricks.net
+      host: https://adb-xxxxxxxxxxxx.xx.azuredatabricks.net
     variables:
-      storage_name: storageaccountswec001
+      storage_name: xxxxxxxxxxxx
       data_base_path: abfss://LAYER@${var.storage_name}.dfs.core.windows.net/youtube_api/
       watermark_table: metadata.watermark.youtube_api
       error_path: ${var.data_base_path}errors/
@@ -49,11 +49,11 @@ targets:
   prod:
     mode: production
     workspace:
-      host: https://adb-7405616644634907.7.azuredatabricks.net
+      host: https://adb-xxxxxxxxxxxx.xx.azuredatabricks.net
       # We explicitly deploy to /Workspace/Users/kacper050710_outlook.com#ext#@kacper050710outlook.onmicrosoft.com to make sure we only have a single copy.
       root_path: /Workspace/Users/kacper050710_outlook.com#ext#@kacper050710outlook.onmicrosoft.com/.bundle/${bundle.name}/${bundle.target}
     variables:
-      storage_name: storageaccountswec001
+      storage_name: xxxxxxxxxxxx
       data_base_path: abfss://LAYER@${var.storage_name}.dfs.core.windows.net/youtube_api/
       watermark_table: metadata.watermark.youtube_api
       error_path: ${var.data_base_path}errors/
