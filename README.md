@@ -2,6 +2,7 @@
 
 Projekt pobiera dane z **YouTube Data API v3** dla wybranych kanałów, zapisuje je warstwowo w **Azure Data Lake Storage Gen2** i przetwarza w architekturze **Medallion** (Raw → Bronze → Silver → Gold) na **Azure Databricks** z wykorzystaniem **Unity Catalog**.
 
+Pierwsza wersja projektu znajduje się w repozytorium: [Youtube-medallion-architecture-project](https://github.com/KacprusJeden/Youtube-medallion-architecture-project)
 ---
 
 ## 1. Architektura
