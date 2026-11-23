@@ -1,0 +1,64 @@
+# This is a Declarative Automation Bundle definition for youtube_channel_analytics_medallion.
+# See https://docs.databricks.com/dev-tools/bundles/index.html for documentation.
+bundle:
+  name: youtube_channel_analytics_medallion
+  uuid: 057366b4-cc95-4a17-91e2-bda740ae1f38
+
+include:
+  - resources/*.yml
+
+artifacts:
+  python_artifact:
+    type: whl
+    build: uv build --wheel
+
+# Variable declarations. These variables are assigned in the dev/prod targets below.
+variables:
+  storage_name:
+    description: Storage account name
+  data_base_path:
+    description: Base ADLS path
+  watermark_table:
+    description: Fully qualified watermark table name
+  error_path:
+    description: Error path
+  checkpoint_path:
+    description: Checkpoint path
+  log_path:
+    description: Log path
+
+targets:
+  dev:
+    # The default target uses 'mode: development' to create a development copy.
+    # - Deployed resources get prefixed with '[dev my_user_name]'
+    # - Any job schedules and triggers are paused by default.
+    # See also https://docs.databricks.com/dev-tools/bundles/deployment-modes.html.
+    mode: development
+    default: true
+    workspace:
+      host: https://adb-7405616644634907.7.azuredatabricks.net
+    variables:
+      storage_name: storageaccountswec001
+      data_base_path: abfss://LAYER@${var.storage_name}.dfs.core.windows.net/youtube_api/
+      watermark_table: metadata.watermark.youtube_api
+      error_path: ${var.data_base_path}errors/
+      checkpoint_path: ${var.data_base_path}checkpoint/
+      log_path: abfss://metadata@${var.storage_name}.dfs.core.windows.net/youtube_api/
+    presets:
+      artifacts_dynamic_version: true
+  prod:
+    mode: production
+    workspace:
+      host: https://adb-7405616644634907.7.azuredatabricks.net
+      # We explicitly deploy to /Workspace/Users/kacper050710_outlook.com#ext#@kacper050710outlook.onmicrosoft.com to make sure we only have a single copy.
+      root_path: /Workspace/Users/kacper050710_outlook.com#ext#@kacper050710outlook.onmicrosoft.com/.bundle/${bundle.name}/${bundle.target}
+    variables:
+      storage_name: storageaccountswec001
+      data_base_path: abfss://LAYER@${var.storage_name}.dfs.core.windows.net/youtube_api/
+      watermark_table: metadata.watermark.youtube_api
+      error_path: ${var.data_base_path}errors/
+      checkpoint_path: ${var.data_base_path}checkpoint/
+      log_path: abfss://metadata@${var.storage_name}.dfs.core.windows.net/youtube_api/
+    permissions:
+      - user_name: kacper050710_outlook.com#ext#@kacper050710outlook.onmicrosoft.com
+        level: CAN_MANAGE

@@ -1,0 +1,287 @@
+# Raw extraction + Bronze load job (YouTube API -> ADLS raw -> Bronze) for youtube_channel_analytics_medallion.
+
+resources:
+  jobs:
+    load_youtube_data:
+      name: load_youtube_data
+
+      email_notifications:
+        on_success:
+          - kacper050710@gmail.com
+        on_failure:
+          - kacper050710@gmail.com
+
+      parameters:
+        - name: date_of_data
+          default: ""
+        - name: mode
+          default: "incremental"
+        - name: reset_checkpoint
+          default: "false"
+        - name: start_layer
+          default: "raw"
+        - name: stop_layer
+          default: "gold"
+
+      tasks:
+        - task_key: raw_extract
+          existing_cluster_id: 0907-120836-jlbuja4g
+          python_wheel_task:
+            package_name: youtube_channel_analytics_medallion
+            entry_point: raw
+            parameters:
+              - "--data_base_path"
+              - "${var.data_base_path}"
+              - "--watermark_table"
+              - "${var.watermark_table}"
+              - "--error_path"
+              - "${var.error_path}"
+              - "--checkpoint_path"
+              - "${var.checkpoint_path}"
+              - "--log_path"
+              - "${var.log_path}"
+              - "--run_id"
+              - "{{job.run_id}}"
+              - "--task_key"
+              - "raw_extract"
+              - "--date_of_data"
+              - "{{job.parameters.date_of_data}}"
+              - "--mode"
+              - "{{job.parameters.mode}}"
+              - "--reset_checkpoint"
+              - "{{job.parameters.reset_checkpoint}}"
+              - "--start_layer"
+              - "{{job.parameters.start_layer}}"
+              - "--stop_layer"
+              - "{{job.parameters.stop_layer}}"
+          libraries:
+            - whl: ../dist/*.whl
+
+        - task_key: bronze_channel
+          depends_on:
+            - task_key: raw_extract
+          existing_cluster_id: 0907-120836-jlbuja4g
+          python_wheel_task:
+            package_name: youtube_channel_analytics_medallion
+            entry_point: bronze_channel
+            parameters:
+              - "--data_base_path"
+              - "${var.data_base_path}"
+              - "--watermark_table"
+              - "${var.watermark_table}"
+              - "--error_path"
+              - "${var.error_path}"
+              - "--checkpoint_path"
+              - "${var.checkpoint_path}"
+              - "--log_path"
+              - "${var.log_path}"
+              - "--run_id"
+              - "{{job.run_id}}"
+              - "--task_key"
+              - "bronze_channel"
+              - "--date_of_data"
+              - "{{job.parameters.date_of_data}}"
+              - "--mode"
+              - "{{job.parameters.mode}}"
+              - "--reset_checkpoint"
+              - "{{job.parameters.reset_checkpoint}}"
+              - "--start_layer"
+              - "{{job.parameters.start_layer}}"
+              - "--stop_layer"
+              - "{{job.parameters.stop_layer}}"
+          libraries:
+            - whl: ../dist/*.whl
+
+        - task_key: bronze_video
+          depends_on:
+            - task_key: raw_extract
+          existing_cluster_id: 0907-120836-jlbuja4g
+          python_wheel_task:
+            package_name: youtube_channel_analytics_medallion
+            entry_point: bronze_video
+            parameters:
+              - "--data_base_path"
+              - "${var.data_base_path}"
+              - "--watermark_table"
+              - "${var.watermark_table}"
+              - "--error_path"
+              - "${var.error_path}"
+              - "--checkpoint_path"
+              - "${var.checkpoint_path}"
+              - "--log_path"
+              - "${var.log_path}"
+              - "--run_id"
+              - "{{job.run_id}}"
+              - "--task_key"
+              - "bronze_video"
+              - "--date_of_data"
+              - "{{job.parameters.date_of_data}}"
+              - "--mode"
+              - "{{job.parameters.mode}}"
+              - "--reset_checkpoint"
+              - "{{job.parameters.reset_checkpoint}}"
+              - "--start_layer"
+              - "{{job.parameters.start_layer}}"
+              - "--stop_layer"
+              - "{{job.parameters.stop_layer}}"
+          libraries:
+            - whl: ../dist/*.whl
+
+        - task_key: bronze_comment
+          depends_on:
+            - task_key: raw_extract
+          existing_cluster_id: 0907-120836-jlbuja4g
+          python_wheel_task:
+            package_name: youtube_channel_analytics_medallion
+            entry_point: bronze_comment
+            parameters:
+              - "--data_base_path"
+              - "${var.data_base_path}"
+              - "--watermark_table"
+              - "${var.watermark_table}"
+              - "--error_path"
+              - "${var.error_path}"
+              - "--checkpoint_path"
+              - "${var.checkpoint_path}"
+              - "--log_path"
+              - "${var.log_path}"
+              - "--run_id"
+              - "{{job.run_id}}"
+              - "--task_key"
+              - "bronze_comment"
+              - "--date_of_data"
+              - "{{job.parameters.date_of_data}}"
+              - "--mode"
+              - "{{job.parameters.mode}}"
+              - "--reset_checkpoint"
+              - "{{job.parameters.reset_checkpoint}}"
+              - "--start_layer"
+              - "{{job.parameters.start_layer}}"
+              - "--stop_layer"
+              - "{{job.parameters.stop_layer}}"
+          libraries:
+            - whl: ../dist/*.whl
+
+        - task_key: silver_channel
+          depends_on:
+            - task_key: bronze_channel
+          existing_cluster_id: 0907-120836-jlbuja4g
+          python_wheel_task:
+            package_name: youtube_channel_analytics_medallion
+            entry_point: silver_transform
+            parameters:
+              - "--data_base_path"
+              - "${var.data_base_path}"
+              - "--watermark_table"
+              - "${var.watermark_table}"
+              - "--error_path"
+              - "${var.error_path}"
+              - "--checkpoint_path"
+              - "${var.checkpoint_path}"
+              - "--log_path"
+              - "${var.log_path}"
+              - "--run_id"
+              - "{{job.run_id}}"
+              - "--task_key"
+              - "silver_channel"
+              - "--date_of_data"
+              - "{{job.parameters.date_of_data}}"
+              - "--mode"
+              - "{{job.parameters.mode}}"
+              - "--dataset_type"
+              - "channels"
+          libraries:
+            - whl: ../dist/*.whl
+
+        - task_key: silver_video
+          depends_on:
+            - task_key: bronze_video
+          existing_cluster_id: 0907-120836-jlbuja4g
+          python_wheel_task:
+            package_name: youtube_channel_analytics_medallion
+            entry_point: silver_transform
+            parameters:
+              - "--data_base_path"
+              - "${var.data_base_path}"
+              - "--watermark_table"
+              - "${var.watermark_table}"
+              - "--error_path"
+              - "${var.error_path}"
+              - "--checkpoint_path"
+              - "${var.checkpoint_path}"
+              - "--log_path"
+              - "${var.log_path}"
+              - "--run_id"
+              - "{{job.run_id}}"
+              - "--task_key"
+              - "silver_video"
+              - "--date_of_data"
+              - "{{job.parameters.date_of_data}}"
+              - "--mode"
+              - "{{job.parameters.mode}}"
+              - "--dataset_type"
+              - "videos"
+          libraries:
+            - whl: ../dist/*.whl
+
+        - task_key: silver_comment
+          depends_on:
+            - task_key: bronze_comment
+          existing_cluster_id: 0907-120836-jlbuja4g
+          python_wheel_task:
+            package_name: youtube_channel_analytics_medallion
+            entry_point: silver_transform
+            parameters:
+              - "--data_base_path"
+              - "${var.data_base_path}"
+              - "--watermark_table"
+              - "${var.watermark_table}"
+              - "--error_path"
+              - "${var.error_path}"
+              - "--checkpoint_path"
+              - "${var.checkpoint_path}"
+              - "--log_path"
+              - "${var.log_path}"
+              - "--run_id"
+              - "{{job.run_id}}"
+              - "--task_key"
+              - "silver_comment"
+              - "--date_of_data"
+              - "{{job.parameters.date_of_data}}"
+              - "--mode"
+              - "{{job.parameters.mode}}"
+              - "--dataset_type"
+              - "comments"
+          libraries:
+            - whl: ../dist/*.whl
+
+        - task_key: gold_yt_statistics
+          depends_on:
+            - task_key: silver_channel
+            - task_key: silver_comment
+            - task_key: silver_video
+          existing_cluster_id: 0907-120836-jlbuja4g
+          python_wheel_task:
+            package_name: youtube_channel_analytics_medallion
+            entry_point: gold_yt_statistics
+            parameters:
+              - "--data_base_path"
+              - "${var.data_base_path}"
+              - "--watermark_table"
+              - "${var.watermark_table}"
+              - "--error_path"
+              - "${var.error_path}"
+              - "--checkpoint_path"
+              - "${var.checkpoint_path}"
+              - "--log_path"
+              - "${var.log_path}"
+              - "--run_id"
+              - "{{job.run_id}}"
+              - "--task_key"
+              - "gold_yt_statistics"
+              - "--date_of_data"
+              - "{{job.parameters.date_of_data}}"
+              - "--mode"
+              - "{{job.parameters.mode}}"
+          libraries:
+            - whl: ../dist/*.whl

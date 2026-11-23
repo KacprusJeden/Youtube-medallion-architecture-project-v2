@@ -1,0 +1,45 @@
+[project]
+name = "youtube_channel_analytics_medallion"
+version = "0.0.1"
+authors = [{ name = "kacper050710_outlook.com#ext#@kacper050710outlook.onmicrosoft.com" }]
+requires-python = ">=3.12,<3.15"
+dependencies = [
+    "databricks-connect>=17.3.15",
+    # Any dependencies for jobs and pipelines in this project can be added here
+    # See also https://docs.databricks.com/dev-tools/bundles/library-dependencies
+    #
+    # LIMITATION: for pipelines, dependencies are cached during development;
+    # add dependencies to the 'environment' section of your pipeline.yml file instead
+    "google-api-python-client",
+    "pip>=26.2.2",
+]
+
+[dependency-groups]
+dev = [
+    "pytest",
+    "ruff",
+    "databricks-dlt",
+    "databricks-connect>=16.4,<17.5",
+    "ipykernel",
+    "cygrpc"
+]
+
+[project.scripts]
+raw = "youtube_channel_analytics_medallion.raw.extract:main"
+bronze_channel = "youtube_channel_analytics_medallion.bronze.channel:main"
+bronze_video = "youtube_channel_analytics_medallion.bronze.video:main"
+bronze_comment = "youtube_channel_analytics_medallion.bronze.comment:main"
+silver_transform = "youtube_channel_analytics_medallion.silver.transform:main"
+gold_yt_statistics = "youtube_channel_analytics_medallion.gold.load_dms:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "--import-mode=importlib"
+markers = ["spark: requires Spark / Databricks Connect"]
+
+[tool.ruff]
+line-length = 120
